@@ -47,3 +47,13 @@ create procedure tests_done_month()
     where t.doctor_id = d.reg_id and t.patient_id = p.patient_id and booking_date >= curdate()-INTERVAL 30 DAY;
 	end //
 DELIMITER ;
+7. DELIMITER //
+create procedure tests_by_count_today()
+begin
+	select sub.name as test_name,count(*) as test_count
+    from (select tt.name
+	from test_booking tb,tests_done td,test_types tt
+    where tb.transaction_id = td.transaction_id and td.test_id = tt.test_id and booking_date = curdate()) as sub
+    group by sub.name;
+end //
+DELIMITER ;
