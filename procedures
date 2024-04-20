@@ -57,3 +57,23 @@ begin
     group by sub.name;
 end //
 DELIMITER ;
+8. DELIMITER //
+create procedure tests_by_count_week()
+begin
+	select sub.name as test_name,count(*) as test_count
+    from (select tt.name
+	from test_booking tb,tests_done td,test_types tt
+    where tb.transaction_id = td.transaction_id and td.test_id = tt.test_id and booking_date >= curdate()-INTERVAL 7 DAY) as sub
+    group by sub.name;
+end //
+DELIMITER ;
+9. DELIMITER //
+create procedure tests_by_count_month()
+begin
+	select sub.name as test_name,count(*) as test_count
+    from (select tt.name
+	from test_booking tb,tests_done td,test_types tt
+    where tb.transaction_id = td.transaction_id and td.test_id = tt.test_id and booking_date >= curdate()-INTERVAL 30 DAY) as sub
+    group by sub.name;
+end //
+DELIMITER ;
