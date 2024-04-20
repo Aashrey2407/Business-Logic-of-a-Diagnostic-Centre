@@ -90,7 +90,7 @@ public class Test extends JFrame implements ActionListener {
                     i--;
                 }
                 JLabel l=new JLabel("Total Price: "+total_price);
-                l.setBounds(250,475,100,20);
+                l.setBounds(250,400,100,20);
                 f.add(l);
                 f.add(text);
                 f.add(ta);
