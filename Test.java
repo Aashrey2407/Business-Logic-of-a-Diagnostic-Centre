@@ -1,141 +1,132 @@
-import java.sql.*;
+import javax.swing.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Date;
 
-public class Database {
-    String url="jdbc:mysql://localhost:3306/diagonostic_centre";
-    String user="root";
-    String password="MyRootUser";
-    public int addPatient(String fn,String ln,String ph,String gen,int age,String address){
-        try{
-            Connection con=DriverManager.getConnection(url,user,password);
-            String q="INSERT INTO patient(first_name,last_name,phone,sex,age,address) VALUES(?,?,?,?,?,?)";
-            PreparedStatement pstmt=con.prepareStatement(q,Statement.RETURN_GENERATED_KEYS);
-            pstmt.setString(1,fn);
-            pstmt.setString(2,ln);
-            pstmt.setString(3,ph);
-            pstmt.setString(4,gen);
-            pstmt.setInt(5,age);
-            pstmt.setString(6,address);
-            pstmt.executeUpdate();
-            ResultSet id=pstmt.getGeneratedKeys();
-            id.next();
-            int res= id.getInt(1);
-            con.close();
-            return res;
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            return 0;
-        }
+public class Test extends JFrame implements ActionListener {
+    ArrayList<Integer> tests;
+    int doctor_id;
+    int patient_id;
+    JLabel l,l1,l2,l3;
+    JTextField t1,t2,t3;
+    JButton b1,b2;
+    public Test(int pat_id){
+        doctor_id=0;
+        tests=new ArrayList<>();
+        this.patient_id=pat_id;
+        this.setTitle("Test Booking");
+        this.setBounds(300,300,500,500);
+        this.setLayout(null);
+
+        l=new JLabel("NOTE: you can book a maximum of 4 tests at a time");
+        l.setBounds(20,4,400,20);
+        this.add(l);
+
+        l1=new JLabel("Doctor id:");
+        l1.setBounds(20,40,100,20);
+        t1=new JTextField();
+        t1.setBounds(140,40,200,20);
+        this.add(l1);
+        this.add(t1);
+
+        l2=new JLabel("Test Type: ");
+        l2.setBounds(20,70,100,20);
+        t2=new JTextField();
+        t2.setBounds(140,70,100,20);
+        this.add(l2);
+        this.add(t2);
+
+        b2=new JButton("Add Test");
+        b2.setBounds(80,130,100,50);
+        this.add(b2);
+        b2.addActionListener(this);
+
+        b1=new JButton("Book Tests");
+        b1.setBounds(200,130,100,50);
+        this.add(b1);
+        b1.addActionListener(this);
+
+        this.setVisible(true);
     }
-
-    public boolean patientExists(int id,String phone){
-        try{
-            Connection con= DriverManager.getConnection(url,user,password);
-            // here run the query SELECT patient_id,phone FROM patient WHERE patient_id=id;
-            String q="SELECT phone FROM patient WHERE patient_id=?";
-            PreparedStatement pstmt=con.prepareStatement(q);
-            pstmt.setInt(1,id);
-            ResultSet rs=pstmt.executeQuery();
-            if(rs.next()){
-                return rs.getString(1).equals(phone);
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if(e.getSource()==b1){
+            if (tests.isEmpty()) {
+                // Show error message for no tests added
+                JFrame f = new JFrame();
+                f.setTitle("Error");
+                JLabel text = new JLabel("Please add at least one test");
+                f.add(text);
+                f.setVisible(true);
+                return;  // Exit the method if no tests added
             }
-            return false;
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            return false;
-        }
-    }
-
-    public int bookAppointment(int doc_id,int pat_id,Date date){
-        try{
-            Connection con=DriverManager.getConnection(url,user,password);
-            String q="INSERT INTO appointments(doctor_id,patient_id,date) VALUES(?,?,?)";
-            PreparedStatement pstmt=con.prepareStatement(q,Statement.RETURN_GENERATED_KEYS);
-            pstmt.setInt(1,doc_id);
-            pstmt.setInt(2,pat_id);
-            pstmt.setDate(3, (java.sql.Date) date);
-
-            pstmt.executeUpdate();
-            ResultSet rs=pstmt.getGeneratedKeys();
-            int apt_id;
-            if(rs.next()){
-                apt_id=rs.getInt(1);
-                con.close();
-                return apt_id;
-            }
-            return 0;
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            return 0;
-        }
-    }
-    public int bookTest(ArrayList<Integer> tests,int patient_id,int doctor_id){
-        try{
-            Connection con=DriverManager.getConnection(url,user,password);
-            String q="INSERT INTO test_booking(doctor_id,patient_id,test_date) VALUES(?,?,?)";
-            PreparedStatement pstmt=con.prepareStatement(q,Statement.RETURN_GENERATED_KEYS);
-            Date test_date=new Date();
-            pstmt.setInt(1,doctor_id);
-            pstmt.setInt(2,patient_id);
-            pstmt.setDate(3,new java.sql.Date(test_date.getTime()));
-            pstmt.executeUpdate();
-            System.out.println("reached here 1");
-            ResultSet rs=pstmt.getGeneratedKeys();
-            int transaction_id=-1;
-            if(rs.next()){
-                transaction_id=rs.getInt(1);
-                con.close();
-            }
-            else
-                return -1;
-
-            System.out.println("reached here 2");
-            Connection con2=DriverManager.getConnection(url,user,password);
-            String q2="INSERT INTO tests_done VALUES(?,?)";
+            JFrame f=new JFrame();
+            f.setLayout(null);
+            f.setBounds(500,500,600,500);
+            Database db=new Database();
+            System.out.println("I reached here 1\n");
+            int trans_id=db.bookTest(this.tests,this.patient_id,doctor_id);
+            ArrayList<String> test_names=new ArrayList<>();
+            ArrayList<Integer> test_prices=new ArrayList<>();
             int i=tests.size()-1;
+            int total_price=0;
             while(i>=0){
-                PreparedStatement pstmt2=con2.prepareStatement(q2);
-                pstmt2.setInt(1,transaction_id);
-                pstmt2.setInt(2, tests.get(i));
-                pstmt2.executeUpdate();
+                ArrayList<Object> a=db.getTestDetails(tests.get(i));
+                test_names.add((String)a.get(0));
+                test_prices.add((int)a.get(1));
+                total_price+=(int)a.get(1);
                 i--;
             }
-            System.out.println("reached here 3");
-            con2.close();
-            return transaction_id;
-        }
-        catch(Exception e){
-            e.printStackTrace();
-            return -1;
-        }
-    }
-    public ArrayList<Object> getTestDetails(int test_id){
-        ArrayList<Object> a=new ArrayList<Object>();
-        try{
-            Connection con= DriverManager.getConnection(url,user,password);
-            // here run the query SELECT patient_id,phone FROM patient WHERE patient_id=id;
-            String q="SELECT test_name,price FROM test WHERE test_id=?";
-            PreparedStatement pstmt=con.prepareStatement(q);
-            pstmt.setInt(1,test_id);
-            ResultSet rs=pstmt.executeQuery();
-            String testName="";
-            int testPrice=0;
-            if(rs.next()){
-                testName=rs.getString(1);
-                testPrice=rs.getInt(2);
+            System.out.println("I reached here 2\n");
+            if(trans_id!=-1){
+                f.setTitle("Test Booked Successfully");
+                JLabel text=new JLabel("Your Transaction id for the booking of test is :"+trans_id );
+                text.setBounds(10,10,400,20);
+                JTextArea ta=new JTextArea();
+                ta.setBounds(5,90,590,300);
+                i=tests.size()-1;
+                while(i>=0){
+                    ta.append("Test "+(tests.size()-i)+": "+test_names.get(i)+" , price: "+test_prices.get(i)+"\n");
+                    i--;
+                }
+                JLabel l=new JLabel("Total Price: "+total_price);
+                l.setBounds(250,475,100,20);
+                f.add(l);
+                f.add(text);
+                f.add(ta);
+                f.setVisible(true);
+                this.hide();
             }
-            a.add(testName);
-            a.add(testPrice);
-            con.close();
-            return a;
+            else{
+                f.setTitle("Test Booking Falied");
+                JLabel text=new JLabel("Transaction has failed plz try again");
+                f.add(text);
+                f.setVisible(true);
+                }
+//            int i=tests.size()-1;
+//            while(i>=0){
+//                System.out.println((int)tests.get(i)+"\n");
+//                i--;
+//            }
         }
-        catch(Exception e){
-            e.printStackTrace();
-            return null;
+        else if(e.getSource()==b2){
+            try{
+                    if(this.doctor_id==0)
+                        this.doctor_id=Integer.parseInt(t1.getText());
+                    int test_id=Integer.parseInt(t2.getText());
+                    tests.add(test_id);
+                    this.t2.setText("");
+                    this.t1.setEnabled(false);
+            }
+            catch(Exception e1){
+                e1.printStackTrace();
+                JFrame f=new JFrame();
+                f.setBounds(500,500,500,100);
+                f.setTitle("ERROR!!!");
+                JLabel l=new JLabel("Please enter both the fields");
+                f.add(l);
+                f.setVisible(true);
+            }
         }
     }
 }
