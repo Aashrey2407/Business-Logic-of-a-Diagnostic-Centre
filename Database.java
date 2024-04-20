@@ -138,4 +138,17 @@ public class Database {
             return null;
         }
     }
+    public ResultSet Appointments_today(){
+        try{
+            Connection con=DriverManager.getConnection(url,user,password);
+            CallableStatement cstmt = con.prepareCall("{get_today_appointments}"); // Assuming no parameters
+            cstmt.execute();
+
+            ResultSet rs = cstmt.getResultSet();
+            return rs;
+        }
+        catch(Exception e){
+            return null;
+        }
+    }
 }
