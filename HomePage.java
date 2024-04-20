@@ -4,8 +4,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class HomePage extends JFrame implements ActionListener {
-    private int id;
-    private String phone;
+    private final int id;
+    private final String phone;
     JButton b1,b2,b3,b4;
     JPanel p;
     public HomePage(int id,String phone){
@@ -36,8 +36,10 @@ public class HomePage extends JFrame implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         if(e.getSource()==b1){
-            System.out.println("happ");
             new Appointment(this.id);
+        }
+        if(e.getSource()==b2){
+            new Test(this.id);
         }
     }
 }
