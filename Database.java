@@ -1,10 +1,11 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class Database {
     String url="jdbc:mysql://localhost:3306/diagonostic_centre";
     String user="root";
-    String password="your-database-password";
+    String password="MyRootUser";
     public int addPatient(String fn,String ln,String ph,String gen,int age,String address){
         try{
             Connection con=DriverManager.getConnection(url,user,password);
@@ -55,7 +56,7 @@ public class Database {
             PreparedStatement pstmt=con.prepareStatement(q,Statement.RETURN_GENERATED_KEYS);
             pstmt.setInt(1,doc_id);
             pstmt.setInt(2,pat_id);
-            pstmt.setDate(3,date);
+            pstmt.setDate(3, (java.sql.Date) date);
 
             pstmt.executeUpdate();
             ResultSet rs=pstmt.getGeneratedKeys();
@@ -75,10 +76,12 @@ public class Database {
     public int bookTest(ArrayList<Integer> tests,int patient_id,int doctor_id){
         try{
             Connection con=DriverManager.getConnection(url,user,password);
-            String q="INSERT INTO test_booking(doctor_id,patient_id) VALUES(?,?)";
+            String q="INSERT INTO test_booking(doctor_id,patient_id,test_date) VALUES(?,?,?)";
             PreparedStatement pstmt=con.prepareStatement(q,Statement.RETURN_GENERATED_KEYS);
+            Date test_date=new Date();
             pstmt.setInt(1,doctor_id);
             pstmt.setInt(2,patient_id);
+            pstmt.setDate(3,new java.sql.Date(test_date.getTime()));
             pstmt.executeUpdate();
             System.out.println("reached here 1");
             ResultSet rs=pstmt.getGeneratedKeys();
