@@ -1,0 +1,49 @@
+#PROCEDURES
+1. delimiter //
+create procedure get_today_appointments()
+begin
+select d.first_name as doctor_first_name,d.last_name as doctor_last_name,p.first_name as patient_first_name,p.last_name as patient_last_name,a.date_ as appointment_date
+    from doctor d,patient p,appointments a
+    where a.doctor_id = d.reg_id and a.patient_id = p.patient_id and date_ = curdate();
+end //
+delimiter ;
+2. delimiter //
+create procedure get_week_appointments()
+begin
+select d.first_name as doctor_first_name,d.last_name as doctor_last_name,p.first_name as patient_first_name,p.last_name as patient_last_name,a.date_ as appointment_date
+    from doctor d,patient p,appointments a
+    where a.doctor_id = d.reg_id and a.patient_id = p.patient_id and date_ >= curdate()- interval 7 day;
+end //
+delimiter ;
+3. delimiter //
+create procedure get_month_appointments()
+begin
+select d.first_name as doctor_first_name,d.last_name as doctor_last_name,p.first_name as patient_first_name,p.last_name as patient_last_name,a.date_ as appointment_date
+    from doctor d,patient p,appointments a
+    where a.doctor_id = d.reg_id and a.patient_id = p.patient_id and date_ >= curdate()- interval 30 day;
+end //
+delimiter ;
+4. DELIMITER //
+create procedure tests_done_today()
+	begin
+	select d.first_name as doctor_first_name,d.last_name as doctor_last_name,p.first_name as patient_first_name,p.last_name as patient_last_name,t.booking_date,tt.name as test_name
+    from doctor d,patient p,test_booking t,test_types tt
+    where t.doctor_id = d.reg_id and t.patient_id = p.patient_id and booking_date = curdate();
+	end //
+DELIMITER ;
+5. DELIMITER //
+create procedure tests_done_week()
+	begin
+	select d.first_name as doctor_first_name,d.last_name as doctor_last_name,p.first_name as patient_first_name,p.last_name as patient_last_name,t.booking_date
+    from doctor d,patient p,test_booking t
+    where t.doctor_id = d.reg_id and t.patient_id = p.patient_id and booking_date >= curdate()-INTERVAL 7 DAY;
+	end //
+DELIMITER ;
+6. DELIMITER //
+create procedure tests_done_month()
+	begin
+	select d.first_name as doctor_first_name,d.last_name as doctor_last_name,p.first_name as patient_first_name,p.last_name as patient_last_name,t.booking_date
+    from doctor d,patient p,test_booking t
+    where t.doctor_id = d.reg_id and t.patient_id = p.patient_id and booking_date >= curdate()-INTERVAL 30 DAY;
+	end //
+DELIMITER ;
