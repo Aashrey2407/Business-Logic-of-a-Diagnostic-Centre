@@ -44,5 +44,8 @@ public class HomePage extends JFrame implements ActionListener {
         if(e.getSource()==b3){
             new Result(this.id);
         }
+        if(e.getSource()==b4){
+            new AllTests(this.id);
+        }
     }
 }
