@@ -25,3 +25,17 @@ begin
     from test_results;
 end //
 delimiter ;
+
+delimiter //
+create trigger after_cancel_test
+after delete on test_booking
+for each row
+begin
+ delete from test_results where transaction_id = old.transaction_id;
+end //
+
+alter table tests_done add constraint fk_test_type_id foreign key(test_id) references test_types(test_id)
+ on update cascade on delete cascade;
+
+alter table tests_done add constraint tests_done_transaction foreign key(transaction_id) references test_booking(transaction_id)
+ on update cascade on delete cascade;
