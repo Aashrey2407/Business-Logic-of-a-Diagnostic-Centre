@@ -7,6 +7,8 @@ import java.sql.*;
 public class Result extends JFrame implements ActionListener {
     private int patient_id;
     private JTable jTable;
+    JLabel l1,l2,l3,l4;
+
 
     String url="jdbc:mysql://localhost:3306/diagonostic_centre";
     String user="root";
@@ -18,9 +20,21 @@ public class Result extends JFrame implements ActionListener {
         this.setBounds(300, 300, 800, 700);
         this.setLayout(null);
 
+        l1=new JLabel("Transaction_id");
+        l2=new JLabel("Test_id");
+        l3=new JLabel("Test-Result");
+        l4=new JLabel("Date");
+        l1.setBounds(10,20,100,20);
+        l2.setBounds(230,20,100,20);
+        l3.setBounds(400,20,100,20);
+        l4.setBounds(650,20,100,20);
         jTable = new JTable();
         jTable.setBounds(10, 40, 780, 400);
         this.add(jTable);
+        this.add(l1);
+        this.add(l2);
+        this.add(l3);
+        this.add(l4);
 
         try (Connection con = DriverManager.getConnection(url, user, password)) {
             ResultSet rs = getAppointments(con, "{call get_test_data("+patient_id+")}"); // Call separate method
@@ -68,3 +82,4 @@ public class Result extends JFrame implements ActionListener {
         JOptionPane.showMessageDialog(this, "Error: " + message, "Error", JOptionPane.ERROR_MESSAGE);
     }
 }
+
