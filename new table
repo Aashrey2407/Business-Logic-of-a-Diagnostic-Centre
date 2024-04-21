@@ -18,12 +18,13 @@ begin
 end //
 delimiter ;
 
-delimiter //
-create procedure get_test_data()
-begin
-	select transaction_id,test_id,results,result_date
-    from test_results;
-end //
+CREATE PROCEDURE get_test_data(IN in_patient_id INT)
+BEGIN
+  SELECT tr.transaction_id, tr.test_id, tr.results, tr.result_date
+  FROM test_results tr
+  INNER JOIN test_booking tb ON tr.transaction_id = tb.transaction_id
+  WHERE tb.patient_id = in_patient_id;
+END //
 delimiter ;
 
 delimiter //
