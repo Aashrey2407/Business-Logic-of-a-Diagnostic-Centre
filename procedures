@@ -77,12 +77,49 @@ begin
     group by sub.name;
 end //
 DELIMITER ;
-10. DELIMITER //
-create procedure monthwise_business()
-begin
-	 select month(tb.booking_date),sum(tt.price) as price
-	from test_booking tb,tests_done td,test_types tt
-    where tb.transaction_id = td.transaction_id and td.test_id = tt.test_id
-    group by month(tb.booking_date);
-end //
+10.
+DELIMITER //
+
+CREATE PROCEDURE monthwise_business()
+BEGIN
+    SELECT 
+        CASE MONTH(tb.booking_date)
+            WHEN 1 THEN 'January'
+            WHEN 2 THEN 'February'
+            WHEN 3 THEN 'March'
+            WHEN 4 THEN 'April'
+            WHEN 5 THEN 'May'
+            WHEN 6 THEN 'June'
+            WHEN 7 THEN 'July'
+            WHEN 8 THEN 'August'
+            WHEN 9 THEN 'September'
+            WHEN 10 THEN 'October'
+            WHEN 11 THEN 'November'
+            WHEN 12 THEN 'December'
+        END AS month_name,
+        SUM(tt.price) AS total_price
+    FROM 
+        test_booking tb
+        INNER JOIN tests_done td ON tb.transaction_id = td.transaction_id
+        INNER JOIN test_types tt ON td.test_id = tt.test_id
+    GROUP BY 
+        CASE MONTH(tb.booking_date)
+            WHEN 1 THEN 'January'
+            WHEN 2 THEN 'February'
+            WHEN 3 THEN 'March'
+            WHEN 4 THEN 'April'
+            WHEN 5 THEN 'May'
+            WHEN 6 THEN 'June'
+            WHEN 7 THEN 'July'
+            WHEN 8 THEN 'August'
+            WHEN 9 THEN 'September'
+            WHEN 10 THEN 'October'
+            WHEN 11 THEN 'November'
+            WHEN 12 THEN 'December'
+        END;
+END //
+
 DELIMITER ;
+
+
+    
