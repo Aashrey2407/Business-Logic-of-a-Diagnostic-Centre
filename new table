@@ -17,3 +17,11 @@ begin
     where results is null;
 end //
 delimiter ;
+
+delimiter //
+create procedure get_test_data()
+begin
+	select transaction_id,test_id,results,result_date
+    from test_results;
+end //
+delimiter ;
