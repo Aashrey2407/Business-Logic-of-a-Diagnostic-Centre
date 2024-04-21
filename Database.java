@@ -48,6 +48,24 @@ public class Database {
             return false;
         }
     }
+    public boolean employeeExists(int id,String phone){
+        try{
+            Connection con= DriverManager.getConnection(url,user,password);
+            // here run the query SELECT patient_id,phone FROM patient WHERE patient_id=id;
+            String q="SELECT phone FROM employee WHERE emp_id=?";
+            PreparedStatement pstmt=con.prepareStatement(q);
+            pstmt.setInt(1,id);
+            ResultSet rs=pstmt.executeQuery();
+            if(rs.next()){
+                return rs.getString(1).equals(phone);
+            }
+            return false;
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+    }
 
     public int bookAppointment(int doc_id,int pat_id,Date date){
         try{
@@ -149,6 +167,37 @@ public class Database {
         }
         catch(Exception e){
             return null;
+        }
+    }
+    public boolean addResults(int transaction_id,int test_id,int employee_id,String res){
+
+        try {
+            Connection con= DriverManager.getConnection(url,user,password);
+            String sql = "UPDATE test_results SET employee_id = ?, results = ?, result_date = ? WHERE transaction_id = ? AND test_id = ?";
+            PreparedStatement statement = con.prepareStatement(sql);
+            Date test_date=new Date();
+            // Set the values in the prepared statement
+            statement.setInt(1, employee_id);
+            statement.setString(2, res);
+            statement.setDate(3, new java.sql.Date(test_date.getTime())); // Convert to SQL Date
+            statement.setInt(4, transaction_id); // Replace with actual transaction ID
+            statement.setInt(5, test_id); // Replace with actual test ID
+
+            // Execute the update
+            int rowsUpdated = statement.executeUpdate();
+
+            // Handle the update result
+            if (rowsUpdated > 0) {
+                statement.close();
+                con.close();
+                return true;
+            } else {
+                return false;
+            }
+        }
+        catch(Exception e){
+            e.printStackTrace();
+            return false;
         }
     }
 }
