@@ -1,0 +1,55 @@
+DELIMITER //
+CREATE TRIGGER generate_bill
+AFTER INSERT ON test_booking
+FOR EACH ROW
+BEGIN
+    -- Insert into bill table
+    INSERT INTO bill (transaction_id, patient_id, amount_paid, date_time)
+    VALUES (NEW.transaction_id, NEW.patient_id, 0, NOW()); -- Assuming initial amount paid is 0
+    
+    -- Insert into tests_done table
+    INSERT INTO tests_done (transaction_id, test_id, patient_id, employee_id)
+    VALUES (NEW.transaction_id, NEW.test_id, NEW.patient_id, NEW.employee_id);
+END;
+//
+DELIMITER ;
+
+
+DELIMITER //
+CREATE TRIGGER update_bill_amount_paid
+BEFORE UPDATE ON bill
+FOR EACH ROW
+BEGIN
+    IF NEW.amount_paid > OLD.amount_paid THEN
+        -- Update amount paid based on the difference
+        SET NEW.amount_paid = NEW.amount_paid - OLD.amount_paid;
+    ELSE
+        -- If the amount decreases, don't allow
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Amount paid cannot be decreased.';
+    END IF;
+END;
+//
+DELIMITER ;
+
+
+DELIMITER //
+CREATE TRIGGER fill_test_results
+AFTER INSERT ON tests_done
+FOR EACH ROW
+BEGIN
+    INSERT INTO test_results (transaction_id, test_id)
+    VALUES (NEW.transaction_id, NEW.test_id);
+END //
+DELIMITER ;
+
+
+DELIMITER //
+CREATE TRIGGER after_cancel_test
+AFTER DELETE ON test_booking
+FOR EACH ROW
+BEGIN
+    DELETE FROM test_results WHERE transaction_id = OLD.transaction_id;
+END //
+DELIMITER ;
+
