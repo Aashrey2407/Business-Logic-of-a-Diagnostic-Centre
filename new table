@@ -1,0 +1,10 @@
+#new table
+create table test_results(transaction_id int,test_id int,employee_id int,results varchar(100),result_date date,primary key(transaction_id,test_id));
+delimiter //
+create trigger fill_test_results
+after insert on tests_done
+for each row
+begin
+	insert into test_results values(new.transaction_id,new.test_id,null,null,null);
+end //
+delimiter ;
