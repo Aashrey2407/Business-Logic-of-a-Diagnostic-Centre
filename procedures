@@ -77,3 +77,12 @@ begin
     group by sub.name;
 end //
 DELIMITER ;
+10. DELIMITER //
+create procedure monthwise_business()
+begin
+	 select month(tb.booking_date),sum(tt.price) as price
+	from test_booking tb,tests_done td,test_types tt
+    where tb.transaction_id = td.transaction_id and td.test_id = tt.test_id
+    group by month(tb.booking_date);
+end //
+DELIMITER ;
