@@ -121,5 +121,13 @@ END //
 
 DELIMITER ;
 
+11. CREATE PROCEDURE get_all_tests(IN in_patient_id INT)
+BEGIN
+  SELECT tb.transaction_id, td.test_id, tb.test_date
+  FROM test_booking tb
+  INNER JOIN tests_done td ON td.transaction_id = tb.transaction_id
+  WHERE tb.patient_id = in_patient_id;
+END //
+delimiter ;
 
     
