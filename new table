@@ -8,3 +8,12 @@ begin
 	insert into test_results values(new.transaction_id,new.test_id,null,null,null);
 end //
 delimiter ;
+
+delimiter //
+create procedure get_pending_results()
+begin
+	select transaction_id,test_id
+    from test_results
+    where results is null;
+end //
+delimiter ;
